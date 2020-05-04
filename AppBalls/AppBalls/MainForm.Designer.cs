@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.square = new System.Windows.Forms.PictureBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.textBoxCountBalls = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -48,11 +47,6 @@
             this.square.Size = new System.Drawing.Size(400, 400);
             this.square.TabIndex = 0;
             this.square.TabStop = false;
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 50;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // textBoxCountBalls
             // 
@@ -131,7 +125,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox square;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox textBoxCountBalls;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
