@@ -7,14 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Windows.Forms;
 
 namespace AppBalls
 {
     public partial class MainForm : System.Windows.Forms.Form
     {
-        List<Ball> logicArrayBalls = new List<Ball>();
-        RoundPictureBox[] phisicArrayBalls;
         int numbThread = 0;
 
         public MainForm()
@@ -22,72 +20,61 @@ namespace AppBalls
             InitializeComponent();
         }
 
-        public void move (int i)
-        {
-            if (logicArrayBalls[i].LeftMove) { phisicArrayBalls[i].Left += logicArrayBalls[i].Speed; }
-            else { phisicArrayBalls[i].Left -= logicArrayBalls[i].Speed; };
-
-            if (logicArrayBalls[i].UpMove) { phisicArrayBalls[i].Top += logicArrayBalls[i].Speed; }
-            else { phisicArrayBalls[i].Top -= logicArrayBalls[i].Speed; };
-
-            if (phisicArrayBalls[i].Left <= square.Left) { logicArrayBalls[i].LeftMove = true; logicArrayBalls[i].randomUpMove(); };
-
-            if (phisicArrayBalls[i].Right >= square.Right) { logicArrayBalls[i].LeftMove = false; logicArrayBalls[i].randomUpMove(); };
-
-            if (phisicArrayBalls[i].Top <= square.Top) { logicArrayBalls[i].UpMove = true; logicArrayBalls[i].randomLeftMove(); };
-
-            if (phisicArrayBalls[i].Bottom >= square.Bottom) { logicArrayBalls[i].UpMove = false; logicArrayBalls[i].randomLeftMove(); };
-        }
-        public  void moveBall()
-        {
-            int number = numbThread;
-            numbThread++;
-            Thread.Sleep(25 * number * 10);
-            int counter = 400;
-            this.Invoke(new Action(() => { Controls.Add(phisicArrayBalls[number]); square.SendToBack(); }));
-            while (counter > 0)
-            {
-                phisicArrayBalls[number].Invoke(new Action(() => move(number)));
-                Thread.Sleep(40);
-                counter--;
-            }
-            phisicArrayBalls[number].Invoke(new Action(() => phisicArrayBalls[number].Hide()));
-        }
         private void buttonOK_Click(object sender, EventArgs e)
         {
             if (Convert.ToInt32(textBoxSiseSquare.Text) > 50 && Convert.ToInt32(textBoxSiseSquare.Text) <= 400) {
                 square.Size = new System.Drawing.Size(Convert.ToInt32(textBoxSiseSquare.Text), Convert.ToInt32(textBoxSiseSquare.Text));
             }
 
-
-            phisicArrayBalls = new RoundPictureBox[Convert.ToInt32(textBoxCountBalls.Text)];
-
-
-            for (int i = 0; i < Convert.ToInt32(textBoxCountBalls.Text); i++)
-            {
-                logicArrayBalls.Add(new Ball(square.Height));
-                Thread.Sleep(20);
-            }
-
-
-            for (int j = 0; j < logicArrayBalls.Count; j++)
-            {
-                phisicArrayBalls[j] = new RoundPictureBox();
-                phisicArrayBalls[j].BackColor = Color.FromArgb(logicArrayBalls[j].Color[0], logicArrayBalls[j].Color[1], logicArrayBalls[j].Color[2]);
-                phisicArrayBalls[j].SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-                phisicArrayBalls[j].Location = new System.Drawing.Point(logicArrayBalls[j].X, logicArrayBalls[j].Y);
-                phisicArrayBalls[j].Size = new System.Drawing.Size(30, 30);
-            }
-            square.SendToBack();
-
-
             Thread[] myThreads = new Thread[Convert.ToInt32(textBoxCountBalls.Text)];
             for (int i = 0; i < Convert.ToInt32(textBoxCountBalls.Text); i++)
             {
                 myThreads[i] = new Thread(new ThreadStart(moveBall));
                 myThreads[i].Start();
-                
-            }            
+                Thread.Sleep(20);
+            }
+        }
+
+        public void moveBall()
+        {
+            int number = numbThread;
+            numbThread++;
+
+            Ball logicBall = new Ball(square.Height);
+
+            RoundPictureBox physicBall = new RoundPictureBox();
+            physicBall.BackColor = Color.FromArgb(logicBall.Color[0],
+                logicBall.Color[1], logicBall.Color[2]);
+            physicBall.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            physicBall.Location = new System.Drawing.Point(logicBall.X, logicBall.Y);
+            physicBall.Size = new System.Drawing.Size(30, 30);
+            Thread.Sleep(25 * number * 10);
+            int counter = 400;
+            this.Invoke(new Action(() => { Controls.Add(physicBall); square.SendToBack(); }));
+
+            while (counter > 0)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    if (logicBall.LeftMove) { physicBall.Left += logicBall.Speed; }
+                    else { physicBall.Left -= logicBall.Speed; };
+
+                    if (logicBall.UpMove) { physicBall.Top += logicBall.Speed; }
+                    else { physicBall.Top -= logicBall.Speed; };
+
+                    if (physicBall.Left <= square.Left) { logicBall.LeftMove = true; logicBall.randomUpMove(); };
+
+                    if (physicBall.Right >= square.Right) { logicBall.LeftMove = false; logicBall.randomUpMove(); };
+
+                    if (physicBall.Top <= square.Top) { logicBall.UpMove = true; logicBall.randomLeftMove(); };
+
+                    if (physicBall.Bottom >= square.Bottom) { logicBall.UpMove = false; logicBall.randomLeftMove(); };
+                }));
+
+                Thread.Sleep(40);
+                counter--;
+            }
+            physicBall.Invoke(new Action(() => physicBall.Hide()));
         }
     }
 }
